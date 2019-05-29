@@ -21,8 +21,8 @@ final class PerformanceMonitorStore {
   func addPerformanceMonitor(performanceMonitor:PerformanceMonitor) {
     performanceMonitors.insert(performanceMonitor)
     
-    NSNotificationCenter.defaultCenter().postNotificationName(
-      PerformanceMonitorStoreDidAddItemNotification,
+    NotificationCenter.default.post(
+        name: NSNotification.Name(rawValue: PerformanceMonitorStoreDidAddItemNotification),
       object: self)
   }
   
@@ -41,8 +41,8 @@ final class PerformanceMonitorStore {
   func removePerformanceMonitor(performanceMonitor:PerformanceMonitor) {
     performanceMonitors.remove(performanceMonitor)
     
-    NSNotificationCenter.defaultCenter().postNotificationName(
-      PerformanceMonitorStoreDidRemoveItemNotification,
+    NotificationCenter.default.post(
+        name: NSNotification.Name(rawValue: PerformanceMonitorStoreDidRemoveItemNotification),
       object: self)
   }
 }

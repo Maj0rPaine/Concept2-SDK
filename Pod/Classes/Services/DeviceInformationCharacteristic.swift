@@ -16,13 +16,13 @@ public enum DeviceInformationCharacteristic:Characteristic {
   
   init?(uuid:CBUUID) {
     switch uuid {
-    case SerialNumber.UUID:
+    case DeviceInformationCharacteristic.SerialNumber.UUID:
       self = .SerialNumber
-    case HardwareRevision.UUID:
+    case DeviceInformationCharacteristic.HardwareRevision.UUID:
       self = .HardwareRevision
-    case FirmwareRevision.UUID:
+    case DeviceInformationCharacteristic.FirmwareRevision.UUID:
       self = .FirmwareRevision
-    case ManufacturerName.UUID:
+    case DeviceInformationCharacteristic.ManufacturerName.UUID:
       self = .ManufacturerName
     default:
       return nil
@@ -42,7 +42,7 @@ public enum DeviceInformationCharacteristic:Characteristic {
     }
   }
   
-  func parse(data data:NSData?) -> CharacteristicModel? {
+    func parse(data _: NSData?) -> CharacteristicModel? {
     switch self {
     case .SerialNumber:
       return nil

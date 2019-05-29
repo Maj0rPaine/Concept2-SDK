@@ -46,17 +46,17 @@ public class Subject<T> {
     To observe changes in the subject, attach a block.
     When you want observation to end, call `dispose` on the returned Disposable
    */
-  public func attach(observer: (T) -> Void) -> Disposable {
+    public func attach(observer: @escaping (T) -> Void) -> Disposable {
     let wrapped = ObserverWrapper(subject: self, function: observer)
     observers.append(wrapped)
     
     // Notify once on attachment
-    wrapped.update(value)
+    wrapped.update(value: value)
     
     return wrapped
   }
   
-  func map<U>(transform: (T) -> U) -> Subject<U> {
+    func map<U>(transform: @escaping (T) -> U) -> Subject<U> {
     let result: Subject<U> = Subject<U>(value: transform(value))
     result.disposable = self.attach { [weak result] value in
       result?.value = transform(value)
@@ -71,7 +71,7 @@ public class Subject<T> {
   
   private func notify() {
     for observer in observers {
-      observer.update(value)
+        observer.update(value: value)
     }
   }
   
@@ -82,7 +82,7 @@ public class Subject<T> {
 
 // MARK: -
 private class ObserverWrapper<T>: Disposable {
-  init(subject: Subject<T>, function: (T) -> Void) {
+    init(subject: Subject<T>, function: @escaping (T) -> Void) {
     self.subject = subject
     self.function = function
   }
@@ -92,7 +92,7 @@ private class ObserverWrapper<T>: Disposable {
   }
   
   func dispose() {
-    subject.detach(self)
+    //subject.detach(self)
   }
   
   unowned let subject: Subject<T>

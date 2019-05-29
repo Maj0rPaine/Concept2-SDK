@@ -20,13 +20,13 @@ public enum Service {
   
   init?(uuid:CBUUID) {
     switch uuid {
-    case DeviceDiscovery.UUID:
+    case Service.DeviceDiscovery.UUID:
       self = .DeviceDiscovery
-    case DeviceInformation.UUID:
+    case Service.DeviceInformation.UUID:
       self = .DeviceInformation
-    case Control.UUID:
+    case Service.Control.UUID:
       self = .Control
-    case Rowing.UUID:
+    case Service.Rowing.UUID:
       self = .Rowing
     default:
       return nil
@@ -77,7 +77,7 @@ public enum Service {
     }
   }
   
-  func characteristic(uuid uuid:CBUUID) -> Characteristic? {
+    func characteristic(_ uuid: CBUUID) -> Characteristic? {
     switch self {
     case .DeviceInformation:
       return DeviceInformationCharacteristic(uuid: uuid)

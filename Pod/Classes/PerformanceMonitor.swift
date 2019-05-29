@@ -18,9 +18,9 @@ public final class PerformanceMonitor
   
   // MARK: Basic Information
   public var peripheralName:String { get { return peripheral.name ?? "Unknown" } }
-  public var peripheralIdentifier:String { get { return peripheral.identifier.UUIDString } }
+    public var peripheralIdentifier:String { get { return peripheral.identifier.uuidString } }
   
-  public var isConnected:Bool { get { return (peripheral.state == .Connected) } }
+    public var isConnected:Bool { get { return (peripheral.state == .connected) } }
   
   // MARK: Rowing Information
   public let averageCalories = Subject<C2CalorieCount>(value: 0)
@@ -160,13 +160,13 @@ public final class PerformanceMonitor
     peripheral.services?.forEach({ (service:CBService) -> () in
       print("Requesting notifications for \(service.description)")
       
-      if let svc = Service(uuid: service.UUID) {
-        peripheral.discoverCharacteristics(svc.characteristicUUIDs,
-          forService:  service)
+        if let svc = Service(uuid: service.uuid) {
+            peripheral.discoverCharacteristics(svc.characteristicUUIDs,
+                                               for:  service)
         
         service.characteristics?.forEach({ (characteristic:CBCharacteristic) -> () in
           print("\t* \(characteristic)")
-          peripheral.setNotifyValue(true, forCharacteristic: characteristic)
+            peripheral.setNotifyValue(true, for: characteristic)
         })
       }
     })
@@ -175,16 +175,15 @@ public final class PerformanceMonitor
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // MARK: Equatable
-@warn_unused_result
+
 public func ==(lhs:PerformanceMonitor, rhs:PerformanceMonitor) -> Bool {
   return (lhs.peripheral == rhs.peripheral)
 }
 
 // MARK: Hashable
 extension PerformanceMonitor: Hashable {
-  public var hashValue: Int {
-    get {
-      return peripheral.hashValue
+    
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(peripheral.hashValue )
     }
-  }
 }

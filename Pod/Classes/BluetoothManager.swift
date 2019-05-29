@@ -22,15 +22,15 @@ public final class BluetoothManager
   
   public static func connectPerformanceMonitor(performanceMonitor:PerformanceMonitor,
     exclusive:Bool) {
-      sharedInstance.connectPerformanceMonitor(performanceMonitor, exclusive: exclusive)
+    sharedInstance.connectPerformanceMonitor(performanceMonitor: performanceMonitor, exclusive: exclusive)
   }
   
   public static func connectPerformanceMonitor(performanceMonitor:PerformanceMonitor) {
-    sharedInstance.connectPerformanceMonitor(performanceMonitor)
+    sharedInstance.connectPerformanceMonitor(performanceMonitor: performanceMonitor)
   }
   
   public static func disconnectPerformanceMonitor(performanceMonitor:PerformanceMonitor) {
-    sharedInstance.disconnectPerformanceMonitor(performanceMonitor)
+    sharedInstance.disconnectPerformanceMonitor(performanceMonitor: performanceMonitor)
   }
   
   public static var isReady:Subject<Bool> {
@@ -45,15 +45,15 @@ public final class BluetoothManager
     }
   }
   
-  private let isReady = Subject<Bool>(value: false)
-  private let performanceMonitors = Subject<Array<PerformanceMonitor>>(value: Array<PerformanceMonitor>())
+  fileprivate let isReady = Subject<Bool>(value: false)
+  fileprivate let performanceMonitors = Subject<Array<PerformanceMonitor>>(value: Array<PerformanceMonitor>())
   
   // MARK: -
-  private var centralManager:CBCentralManager
-  private var centralManagerDelegate:CentralManagerDelegate
-  private let centralManagerQueue = dispatch_queue_create(
-    "com.boutfitness.concept2.bluetooth.central",
-    DISPATCH_QUEUE_CONCURRENT
+  fileprivate var centralManager:CBCentralManager
+  fileprivate var centralManagerDelegate:CentralManagerDelegate
+  fileprivate let centralManagerQueue = DispatchQueue(
+    label: "com.boutfitness.concept2.bluetooth.central",
+    attributes: DispatchQueue.Attributes.concurrent
   )
   
   // MARK: Initialization
@@ -62,24 +62,23 @@ public final class BluetoothManager
     centralManager = CBCentralManager(delegate: centralManagerDelegate,
       queue: centralManagerQueue)
     
-    self.isReady.value = (centralManager.state == CBCentralManagerState.PoweredOn)
+    self.isReady.value = (centralManager.state == CBManagerState.poweredOn)
     
     //
-    NSNotificationCenter.defaultCenter().addObserverForName(
-      PerformanceMonitorStoreDidAddItemNotification,
+    NotificationCenter.default.addObserver(
+        forName: NSNotification.Name(rawValue: PerformanceMonitorStoreDidAddItemNotification),
       object: PerformanceMonitorStore.sharedInstance,
       queue: nil) { [weak self] (notification) -> Void in
         if let weakSelf = self {
-          dispatch_async(dispatch_get_main_queue(), { () -> Void in
+            DispatchQueue.main.async(execute: { () -> Void in
             weakSelf.performanceMonitors.value = Array(PerformanceMonitorStore.sharedInstance.performanceMonitors)
-          })
+            })
         }
     }
   }
   
   func scanForPerformanceMonitors() {
-    centralManager.scanForPeripheralsWithServices([Service.DeviceDiscovery.UUID],
-      options: nil)
+    centralManager.scanForPeripherals(withServices: [Service.DeviceDiscovery.UUID], options: nil)
   }
   
   func stopScanningForPerformanceMonitors() {
@@ -89,9 +88,9 @@ public final class BluetoothManager
   func connectPerformanceMonitor(performanceMonitor:PerformanceMonitor, exclusive:Bool) {
     // TODO: use the PerformanceMonitor abstraction instead of peripherals
     if exclusive == true {
-      centralManager.retrieveConnectedPeripheralsWithServices([Service.DeviceDiscovery.UUID])
+        centralManager.retrieveConnectedPeripherals(withServices: [Service.DeviceDiscovery.UUID])
         .forEach { (peripheral) -> () in
-        if peripheral.state == .Connected {
+            if peripheral.state == .connected {
           if peripheral != performanceMonitor.peripheral {
             centralManager.cancelPeripheralConnection(peripheral)
           }
@@ -99,14 +98,15 @@ public final class BluetoothManager
       }
     }
     
-    centralManager.connectPeripheral(performanceMonitor.peripheral, options: nil)
+    centralManager.connect(performanceMonitor.peripheral, options: nil)
   }
   
   func connectPerformanceMonitor(performanceMonitor:PerformanceMonitor) {
-    self.connectPerformanceMonitor(performanceMonitor, exclusive: true)
+    self.connectPerformanceMonitor(performanceMonitor: performanceMonitor, exclusive: true)
   }
   
   func disconnectPerformanceMonitor(performanceMonitor:PerformanceMonitor) {
     centralManager.cancelPeripheralConnection(performanceMonitor.peripheral)
   }
 }
+

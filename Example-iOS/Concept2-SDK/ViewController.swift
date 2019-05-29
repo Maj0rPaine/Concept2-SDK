@@ -23,26 +23,26 @@ class ViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    NSNotificationCenter.defaultCenter().addObserverForName(
-      PerformanceMonitor.DidUpdateStateNotification,
+    NotificationCenter.default.addObserver(
+        forName: NSNotification.Name(rawValue: PerformanceMonitor.DidUpdateStateNotification),
       object:  nil,
       queue: nil) { (notification) -> Void in
         if let pm = notification.object as? PerformanceMonitor {
-          dispatch_async(dispatch_get_main_queue(), { () -> Void in
-            self.performanceMonitorStateDidUpdate(pm)
+            DispatchQueue.main.async( execute: { () -> Void in
+                self.performanceMonitorStateDidUpdate(performanceMonitor: pm)
           })
         }
     }
     tableView.reloadData()
   }
   
-  override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     
     isReadyDisposable = BluetoothManager.isReady.attach {
       [weak self] (isReady:Bool) -> Void in
       if let weakSelf = self {
-        dispatch_async(dispatch_get_main_queue(), { () -> Void in
+        DispatchQueue.main.async(execute: { () -> Void in
           weakSelf.updateUI()
         })
       }
@@ -53,18 +53,18 @@ class ViewController: UIViewController {
       if let weakSelf = self {
         weakSelf.performanceMonitors = performanceMonitors
         
-        dispatch_async(dispatch_get_main_queue(), { () -> Void in
+        DispatchQueue.main.async(execute: { () -> Void in
           weakSelf.tableView.reloadData()
         })
       }
     }
   }
   
-  override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
   }
   
-  override func viewDidDisappear(animated: Bool) {
+    override func viewDidDisappear(_ animated: Bool) {
     isReadyDisposable?.dispose()
     isReadyDisposable = nil
     
@@ -81,28 +81,28 @@ class ViewController: UIViewController {
   }
   
   func updateUI() {
-    scanButton.enabled = BluetoothManager.isReady.value
+    scanButton.isEnabled = BluetoothManager.isReady.value
   }
   
   
   func performanceMonitorStateDidUpdate(performanceMonitor:PerformanceMonitor) {
     print("PerformanceMonitorStateDidUpdate: \(performanceMonitor.peripheralName)")
-    
-    if let index = performanceMonitors.indexOf(performanceMonitor) {
-      tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: index, inSection: 0)],
-        withRowAnimation: .Automatic)
+
+    if let index = performanceMonitors.firstIndex(of: performanceMonitor) {
+        tableView.reloadRows(at: [NSIndexPath(row: index, section: 0) as IndexPath],
+                             with: .automatic)
     }
     
     if performanceMonitor.isConnected {
       print("\tConnected - Enabling services")
-      self.performSegueWithIdentifier("PresentPerformanceMonitor", sender: performanceMonitor)
+        self.performSegue(withIdentifier: "PresentPerformanceMonitor", sender: performanceMonitor)
     }
   }
   
-  override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+  func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
     if segue.identifier == "PresentPerformanceMonitor" {
       if let pm = sender as? PerformanceMonitor {
-        if let vc = segue.destinationViewController as? PerformanceMonitorViewController {
+        if let vc = segue.destination as? PerformanceMonitorViewController {
           vc.performanceMonitor = pm
         }
       }
@@ -112,17 +112,17 @@ class ViewController: UIViewController {
 
 // MARK: UITableViewDataSource
 extension ViewController: UITableViewDataSource {
-  func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return performanceMonitors.count
-  }
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return performanceMonitors.count
+    }
   
-  func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-    if let cell = tableView.dequeueReusableCellWithIdentifier("CBPeripheral") {
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    if let cell = tableView.dequeueReusableCell(withIdentifier: "CBPeripheral") {
       let pm:PerformanceMonitor = performanceMonitors[indexPath.row]
       
       cell.textLabel?.text = pm.peripheralName
       cell.detailTextLabel?.text = pm.peripheralIdentifier
-      cell.accessoryType = pm.isConnected ? .Checkmark : .None
+        cell.accessoryType = pm.isConnected ? .checkmark : .none
       
       return cell
     } else {
@@ -133,15 +133,15 @@ extension ViewController: UITableViewDataSource {
 
 // MARK: UITableViewDelegate
 extension ViewController: UITableViewDelegate {
-  func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-    tableView.deselectRowAtIndexPath(indexPath, animated: true)
+    private func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    tableView.deselectRow(at: indexPath as IndexPath, animated: true)
     
     // We've found a PM to connect to, stop scanning to save power
     BluetoothManager.stopScanningForPerformanceMonitors()
     
     // Attempt to connect to the PM
     let pm:PerformanceMonitor = performanceMonitors[indexPath.row]
-    BluetoothManager.connectPerformanceMonitor(pm)
+    BluetoothManager.connectPerformanceMonitor(performanceMonitor: pm)
   }
 }
 

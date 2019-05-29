@@ -11,5 +11,5 @@ import CoreBluetooth
 protocol Characteristic {
   var UUID:CBUUID { get }
   
-  func parse(data data:NSData?) -> CharacteristicModel?
+  func parse(data:NSData?) -> CharacteristicModel?
 }

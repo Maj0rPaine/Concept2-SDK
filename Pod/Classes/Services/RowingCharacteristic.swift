@@ -24,29 +24,29 @@ public enum RowingCharacteristic:Characteristic {
   
   init?(uuid:CBUUID) {
     switch uuid {
-    case GeneralStatus.UUID:
+    case RowingCharacteristic.GeneralStatus.UUID:
       self = .GeneralStatus
-    case AdditionalStatus1.UUID:
+    case RowingCharacteristic.AdditionalStatus1.UUID:
       self = .AdditionalStatus1
-    case AdditionalStatus2.UUID:
+    case RowingCharacteristic.AdditionalStatus2.UUID:
       self = .AdditionalStatus2
-    case StatusSampleRate.UUID:
+    case RowingCharacteristic.StatusSampleRate.UUID:
       self = .StatusSampleRate
-    case StrokeData.UUID:
+    case RowingCharacteristic.StrokeData.UUID:
       self = .StrokeData
-    case AdditionalStrokeData.UUID:
+    case RowingCharacteristic.AdditionalStrokeData.UUID:
       self = .AdditionalStrokeData
-    case IntervalData.UUID:
+    case RowingCharacteristic.IntervalData.UUID:
       self = .IntervalData
-    case AdditionalIntervalData.UUID:
+    case RowingCharacteristic.AdditionalIntervalData.UUID:
       self = .AdditionalIntervalData
-    case WorkoutSummaryData.UUID:
+    case RowingCharacteristic.WorkoutSummaryData.UUID:
       self = .WorkoutSummaryData
-    case AdditionalWorkoutSummaryData.UUID:
+    case RowingCharacteristic.AdditionalWorkoutSummaryData.UUID:
       self = .AdditionalWorkoutSummaryData
-    case HeartRateBeltInformation.UUID:
+    case RowingCharacteristic.HeartRateBeltInformation.UUID:
       self = .HeartRateBeltInformation
-    case MutliplexedInformation.UUID:
+    case RowingCharacteristic.MutliplexedInformation.UUID:
       self = .MutliplexedInformation
     default:
       return nil
@@ -82,8 +82,8 @@ public enum RowingCharacteristic:Characteristic {
     }
   }
   
-  func parse(data data:NSData?) -> CharacteristicModel? {
-    if let data = data {
+    func parse(data input:NSData?) -> CharacteristicModel? {
+    if let data = input {
       switch self {
       case .GeneralStatus:
         return RowingGeneralStatus(fromData: data)

@@ -14,9 +14,9 @@ public enum ControlCharacteristic:Characteristic {
   
   init?(uuid:CBUUID) {
     switch uuid {
-    case Command.UUID:
+    case ControlCharacteristic.Command.UUID:
       self = .Command
-    case Response.UUID:
+    case ControlCharacteristic.Response.UUID:
       self = .Response
     default:
       return nil
@@ -32,7 +32,7 @@ public enum ControlCharacteristic:Characteristic {
     }
   }
   
-  func parse(data data:NSData?) -> CharacteristicModel? {
+    func parse(data:NSData?) -> CharacteristicModel? {
     switch self {
     case .Command:
       return nil

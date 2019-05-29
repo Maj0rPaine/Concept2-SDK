@@ -41,7 +41,7 @@ struct RowingIntervalData: CharacteristicModel, CustomDebugStringConvertible {
   var intervalNumber:C2IntervalCount
   
   init(fromData data: NSData) {
-    var arr = [UInt8](count: DataLength, repeatedValue: 0)
+    var arr = [UInt8](repeating: 0, count: DataLength)
     data.getBytes(&arr, length: DataLength)
     
     elapsedTime = C2TimeInterval(timeWithLow: UInt32(arr[0]), mid: UInt32(arr[1]), high: UInt32(arr[2]))
